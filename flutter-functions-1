@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'package:yaml/yaml.dart';
 
 // Function to replace includes in HTML content
 Future<String> replaceIncludes(String htmlContent) async {
@@ -56,6 +57,7 @@ Future<void> replicateFolder(String inputBaseFolder, String outputBaseFolder) as
       if (entity.path.endsWith('.html')) {
         final htmlContent = await entity.readAsString();
         final processedContent = await replaceIncludes(htmlContent);
+        final processedContent = await processHtmlWithFrontMatter((processedConten);
         final newFile = File(newPath);
         await newFile.writeAsString(processedContent);
       } else {
@@ -71,4 +73,42 @@ void main() async {
 
   await replicateFolder(inputBaseFolder, outputBaseFolder);
   print('Replication complete.');
+}
+
+
+
+
+// Function to replace FrontMatter variables in HTML content
+Future<String> processHtmlWithFrontMatter(String fileContent) async {
+  // Read the file content
+
+  // Split the file content into FrontMatter and HTML content
+  final parts = fileContent.split(RegExp(r'\n---\n'));
+
+  if (parts.length < 3) {
+    // If there's no FrontMatter, return the content as is
+    return fileContent;
+  }
+
+  final frontMatterContent = parts[1];
+  final htmlContent = parts.sublist(2).join('\n---\n');
+
+  // Parse the FrontMatter content as YAML
+  final frontMatter = loadYaml(frontMatterContent);
+
+  // Replace placeholders in the HTML content with FrontMatter values
+  var processedHtmlContent = htmlContent;
+  if (frontMatter is Map) {
+    frontMatter.forEach((key, value) {
+      processedHtmlContent = processedHtmlContent.replaceAll('{{$key}}', value.toString());
+    });
+  }
+
+  return processedHtmlContent;
+}
+
+void main2() async {
+  final filePath = 'path/to/your/htmlfile.html';
+  final processedHtmlContent = await processHtmlWithFrontMatter(filePath);
+  print(processedHtmlContent);
 }
