@@ -107,8 +107,4 @@ Future<String> processHtmlWithFrontMatter(String fileContent) async {
   return processedHtmlContent;
 }
 
-void main2() async {
-  final filePath = 'path/to/your/htmlfile.html';
-  final processedHtmlContent = await processHtmlWithFrontMatter(filePath);
-  print(processedHtmlContent);
-}
+
